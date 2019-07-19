@@ -7,7 +7,7 @@ fname_1="Z__C_RJTD_"
 fname_2=_"MSM_GPV_Rjp_L-pall_FH00-15_grib2.bin"
 
 # デフォルト設定
-dl_dir="data/"
+dl_dir="download/"
 
 year=2017
 month=8
