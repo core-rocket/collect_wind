@@ -11,10 +11,13 @@ dl_dir="data/"
 
 year=2017
 month=8
+day=1
 start_day=1
 end_day=31
 
 hour=6
+start_hour=6
+end_hour=9
 min=0
 sec=0
 
@@ -33,36 +36,68 @@ usage(){
 }
 
 version(){
-	echo "$(basename $0) 0.1"
+	echo "$(basename $0) 0.2"
 	echo "Copyright (C) 2019 Challengers Of Rocket Engineering"
 	echo -e "\nWritten by sksat <sksat@sksat.net>"
 }
 
-while getopts d:y:m:s:e:hv OPT
-do
-	case $OPT in
-		d ) dl_dir=$OPTARG;;
-		y ) year=$OPTARG;;
-		m ) month=$OPTARG;;
-		s ) start_day=$OPTARG;;
-		e ) end_day=$OPTARG;;
-		h ) usage
-			exit 0 ;;
-		v ) version
-			exit 0 ;;
-	esac
-done
+parse_opt(){
+	while getopts d:hv OPT
+	do
+		case $OPT in
+			d ) dl_dir=$OPTARG;;
+			h ) usage
+				exit 0 ;;
+			v ) version
+				exit 0 ;;
+		esac
+	done
+	shift $((OPTIND - 1))
+	year=$1
+	month=$2
+	start_day=$3
+	end_day=$4
+	start_hour=$5
+	end_hour=$6
+}
 
-if [ ! -d $dl_dir ];then
-	mkdir -p $dl_dir
-fi
-
-for ((day=$start_day; $day <= $end_day; day++)); do
-	t=$(printf "%d%02d%02d%02d%02d%02d" $year $month $day $hour $min $sec)
-	date=$(printf %d/%02d/%02d $year $month $day)
+download_data(){
+	t=`printf "%d%02d%02d%02d%02d%02d" $year $month $day $hour $min $sec`
 	fname=$fname_1$t$fname_2
 	url=$url_base/$date/$fname
-	echo -n "downloading $date data..."
 	wget -q -c -P $dl_dir $url
-	echo "[ok]"
-done
+}
+
+dl_grib2(){
+	if [ ! -d $dl_dir ]; then
+		mkdir -p $dl_dir
+	fi
+	for ((day=$start_day; $day <= $end_day; day++)){
+		date=`printf "%d/%02d/%02d" $year $month $day`
+		echo -n "downloading $date data "
+		for (( hour=$start_hour; $hour <= $end_hour; hour++ )) {
+			download_data
+			echo -n "."
+		}
+		echo " [ok]"
+	}
+}
+
+default(){
+	month=8
+	start_day=10
+	end_day=20
+	start_hour=6
+	end_hour=9
+	for ((year=2016; $year <= 2018; year++)) {
+		dl_grib2
+	}
+}
+
+if [ $# = 0 ];then
+	default
+	exit 0
+fi
+
+parse_opt
+dl_grib2
