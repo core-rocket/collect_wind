@@ -29,7 +29,8 @@ get_value(){
 }
 
 extract_data(){
-	fname="download/Z__C_RJTD_20160810060000_MSM_GPV_Rjp_L-pall_FH00-15_grib2.bin"
+	#fname="download/Z__C_RJTD_20160810060000_MSM_GPV_Rjp_L-pall_FH00-15_grib2.bin"
+	fname=$1
 	ugrd=(`get_value $fname "UGRD"`)
 	vgrd=(`get_value $fname "VGRD"`)
 
@@ -45,17 +46,17 @@ extract_data(){
 extract_all(){
 	grib2s=`ls download/*grib2.bin`
 	for grib2 in $grib2s; do
-		grib2=`basename $grib2`
+		grib2_base=`basename $grib2`
 		date=""
-		if [[ $grib2 =~ ^Z__C_RJTD_(.+)_MSM(.+)$ ]];then
+		if [[ $grib2_base =~ ^Z__C_RJTD_(.+)_MSM(.+)$ ]];then
 			date=${BASH_REMATCH[1]}
 		else
 			echo error
 			exit 1
 		fi
-		fname=data/$date.txt
-		echo -n "writing $fname ... "
-		extract_data > $fname
+		txt=data/$date.txt
+		echo -n "writing $txt ... "
+		extract_data $grib2 > $txt
 		echo "[ok]"
 	done
 }
