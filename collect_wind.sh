@@ -9,6 +9,9 @@ lng=40.2430
 # 使う指定気圧面: 1000, 975, 950, 925, 900, 850 (6個)
 # 指定気圧面は1000から100で，実測値，予報値(3,6,9,12,15)と並んでいる
 # なので，head -n6してしまえば今回使うデータ(実測値)は取れる
+# 1000, 975, 950, 925, 900, 850, 800, 700, 600, 500, 400, 300, 200, 150, 100
+
+declare -a height_array=(1000 975 950 925 900 850 800 700 600 500 400 300 200 150 100)
 
 # UGRD: 東西風
 # VGRD: 南北風
@@ -16,7 +19,7 @@ lng=40.2430
 get_value(){
 	fname=$1
 	data_type=$2
-	lines=`wgrib2 $fname -lon $lat $lng -match ":"$data_type | head -n6`
+	lines=`wgrib2 $fname -lon $lat $lng -match ":"$data_type | head -n15`
 	for l in $lines; do
 		#echo $l
 		id=`cut -d':' -f 1 <<< $l`
@@ -34,12 +37,14 @@ extract_data(){
 	ugrd=(`get_value $fname "UGRD"`)
 	vgrd=(`get_value $fname "VGRD"`)
 
-	for ((i=0; i<6; i++)) {
-		height=`expr 1000 - 25 \* $i`
-		if [ $height = 875 ];then
-			height=850
-		fi
+	i=0
+	for height in ${height_array[@]}; {
+		#height=`expr 1000 - 25 \* $i`
+		#if [ $height = 875 ];then
+		#	height=850
+		#fi
 		echo $height ${ugrd[i]} ${vgrd[i]}
+		i=$i+1
 	}
 }
 

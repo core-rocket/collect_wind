@@ -9,8 +9,8 @@ fname_2=_"MSM_GPV_Rjp_L-pall_FH00-15_grib2.bin"
 # デフォルト設定
 dl_dir="download/"
 
-year=2017
-month=8
+year=2019
+month=9
 day=1
 start_day=1
 end_day=31
@@ -84,12 +84,12 @@ dl_grib2(){
 }
 
 default(){
-	month=8
-	start_day=10
+	month=9
+	start_day=14
 	end_day=20
 	start_hour=6
 	end_hour=9
-	for ((year=2016; $year <= 2018; year++)) {
+	for ((year=2017; $year <= 2019; year++)) {
 		dl_grib2
 	}
 }
